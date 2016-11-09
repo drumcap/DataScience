@@ -182,7 +182,6 @@ print reduce3(lambda x, y : x if x > y else y, [1, 1, 2, 3, 4, 5])
 
 
 """이진탐색 재귀함수"""
-
 def recursive_binary(fnum, numlist, reindex):
     newlist = numlist
     newindex = len(newlist) / 2
@@ -195,3 +194,107 @@ def recursive_binary(fnum, numlist, reindex):
         return recursive_binary(fnum, newlist[:newindex], reindex)
 
 print recursive_binary(7, [0, 1, 2, 3, 4, 5, 6, 7, 8], 0)
+
+
+"""sorted 함수 구현"""
+def sorted2(numlist, key):
+    for tnum1 in range(len(numlist)):
+        for tnum2 in range(len(numlist)):
+            if tnum1 >= tnum2:
+                continue
+            if key(numlist[tnum1]) >= key(numlist[tnum2]):
+                temp = numlist[tnum1]
+                numlist[tnum1] = numlist[tnum2]
+                numlist[tnum2] = temp
+
+    return numlist
+
+nums = [('a', 3), ('c', 2), ('e', 6), ('b', 1)]
+print sorted2(nums, key = lambda x : x[1])
+
+
+"""완전수 판별 함수"""
+def perfectnum(num):
+    aliquot = []
+    for i in range(1, num):
+        if num % i == 0:
+            aliquot.append(i)
+    if sum(aliquot) == num:
+        return "correct"
+    else:
+        return "No Perfect number"
+
+print perfectnum(7)
+
+
+"""서로소 판별 함수"""
+def relative_prime(num1, num2):
+    aliquot1 = []
+    aliquot2 = []
+    for i in range(2, num1 + 1):
+        if num1 % i == 0:
+            aliquot1.append(i)
+    for j in range(2, num2 + 1):
+        if num2 % i == 0:
+            aliquot2.append(j)
+    for k in aliquot1:
+        if k in aliquot2:
+            return "No relative prime"
+    return "relative prime"
+
+def relative_prime2(num1, num2):
+    for i in range(2, num1 + 1):
+        if num1 % i == 0 and num2 % i == 0:
+            return "No relatice prime"
+    return "relative prime"
+
+print relative_prime(3, 7)
+print relative_prime2(3, 7)
+
+
+"""anagram 확인 함수"""
+from collections import Counter
+
+def is_anagram(char1, char2):
+    count1 = Counter(char1)
+    count2 = Counter(char2)
+    for key1 in count1:
+        if not count1[key1] == count2[key1]:
+            return "not anagram"
+    return "anagram"
+
+def is_anagram2(char1, char2):
+    return sorted(char1) == sorted(char2)
+
+print is_anagram("hello", "olle")
+print is_anagram2("hello", "olle")
+
+
+"""암호화 및 복호화"""
+key = {'a':'n', 'b':'o', 'c':'p', 'd':'q', 'e':'r', 'f':'s', 'g':'t', 'h':'u',
+       'i':'v', 'j':'w', 'k':'x', 'l':'y', 'm':'z', 'n':'a', 'o':'b', 'p':'c',
+       'q':'d', 'r':'e', 's':'f', 't':'g', 'u':'h', 'v':'i', 'w':'j', 'x':'k',
+       'y':'l', 'z':'m', 'A':'N', 'B':'O', 'C':'P', 'D':'Q', 'E':'R', 'F':'S',
+       'G':'T', 'H':'U', 'I':'V', 'J':'W', 'K':'X', 'L':'Y', 'M':'Z', 'N':'A',
+       'O':'B', 'P':'C', 'Q':'D', 'R':'E', 'S':'F', 'T':'G', 'U':'H', 'V':'I',
+       'W':'J', 'X':'K', 'Y':'L', 'Z':'M'}
+
+def encode_f(char):
+    new_word = ""
+    for c in char:
+        new_word += key[c]
+    return new_word
+
+def decode_f(char):
+    new_word = ""
+    new_key_dict = {}
+
+    for i, j in key.items():
+        new_key_dict[j] = i
+
+    for c in char:
+        new_word += new_key_dict[c]
+    return new_word
+
+print encode_f("Hello")
+print decode_f(encode_f("Hello"))

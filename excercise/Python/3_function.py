@@ -11,6 +11,7 @@ def c_to_f(temper):
 
 print c_to_f(30)
 
+
 """리스트에서 홀수만 합해서 반환"""
 def odd_sum(numlist):
     numsum = 0

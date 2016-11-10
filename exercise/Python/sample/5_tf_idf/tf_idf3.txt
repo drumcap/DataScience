@@ -1,0 +1,4 @@
+machine learning is the one branch of artificial intelligence
+it can be used anywhere to predict classify analyze with bunch of data out there
+The more we have the better the result will be
+Today we learnin classification and regression they are supervised machine learning and we can predict the price of the houses using the features they have 

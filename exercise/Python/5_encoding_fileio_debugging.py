@@ -51,7 +51,7 @@ def find_tf(f_word):
     tf_result = {}
     for i, cont in enumerate(content_list):
         count_word = Counter(cont.split())
-        
+
         if f_word not in cont:
             tf_result[i] = 0
 

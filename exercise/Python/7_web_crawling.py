@@ -170,3 +170,61 @@ result = get_news_comment('http://comment.daum.net/apis/v1/posts/16038594/commen
 
 for com in result:
     print com
+
+
+"네이버 실시간 검색 크롤링"
+import requests
+from bs4 import BeautifulSoup
+import re
+
+response = requests.get("http://www.naver.com")
+soup = BeautifulSoup(response.content)
+
+ranklist = soup.find('ol', attrs = {'id' : 'realrank'})
+for li in ranklist.find_all('li'):
+    print li.a['title']
+
+
+"""가온 차트 100위 까지 크롤링"""
+import requests
+from bs4 import BeautifulSoup
+
+response = requests.get("http://www.gaonchart.co.kr/main/section/chart/online.gaon")
+soup = BeautifulSoup(response.content)
+
+for td in soup.find_all('td', attrs = {'class' : 'subject'}):
+    for p in td.find_all(lambda tag : tag.name == 'p' and (tag.has_attr('title'))):
+        print p.get_text()
+
+
+"""selenium으로 daum 뉴스 크롤링"""
+from selenium import webdriver
+
+chromedriver = './chromedriver'
+driver = webdriver.Chrome(chromedriver)
+driver.get("http://v.media.daum.net/v/20161116200216866")
+
+title = driver.find_element_by_tag_name("h3").text
+article = driver.find_element_by_class_name("article_view").find_elements_by_tag_name("p")
+content = ''
+for p in article:
+    content += p.text
+
+print title
+print content
+
+driver.quit()
+
+
+"""인스타그램 자동 로그인 하기"""
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+chromedriver = './chromedriver'
+driver = webdriver.Chrome(chromedriver)
+driver.get('https://www.instagram.com')
+
+driver.find_element_by_class_name('_fcn8k').click()
+driver.find_element_by_name('username').send_keys("hello")
+driver.find_element_by_name('password').send_keys("world")
+driver.find_element_by_tag_name('button').click()

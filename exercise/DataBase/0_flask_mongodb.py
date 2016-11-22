@@ -12,9 +12,9 @@ from exer_connection import Api_key_daum
 from HTMLParser import HTMLParser
 import re
 from pymongo import MongoClient
-from exer_connection_db import mongo_account
+from exer_connection_db import mongo_account, server
 
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com' ,27017)
+mongo = MongoClient(server ,27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'],
 source = 'test')
 daum_api = mongo.test.daum_api
@@ -41,8 +41,8 @@ for doc in result:
 
 """find city whose population is greater than 10,000,000"""
 from pymongo import MongoClient
-from exer_connection_db import mongo_account
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com' ,27017)
+from exer_connection_db import mongo_account, server
+mongo = MongoClient(server ,27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
 zip_collection = mongo.test.zip
 
@@ -74,9 +74,9 @@ print new_state_pop
 
 """find average poopulation in states"""
 from pymongo import MongoClient
-from exer_connection_db import mongo_account
+from exer_connection_db import mongo_account, server
 
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com', 27017)
+mongo = MongoClient(server, 27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
 zip_collection = mongo.test.zip
 
@@ -91,9 +91,9 @@ for doc in result:
 
 """find maximum,  minimun population in states"""
 from pymongo import MongoClient
-from exer_connection_db import mongo_account
+from exer_connection_db import mongo_account, server
 
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com', 27017)
+mongo = MongoClient(server, 27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
 zip_collection = mongo.test.zip
 
@@ -110,7 +110,7 @@ for doc in result:
 
 
 """find the number of restaurant per borough"""
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com' ,27017)
+mongo = MongoClient(server ,27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
 rest = mongo.test.rest
 
@@ -123,13 +123,43 @@ for doc in result:
 
 
 """find the number of 'Brazilian' restaurant per zipcode"""
-mongo = MongoClient('ec2-54-213-224-243.us-west-2.compute.amazonaws.com' ,27017)
+mongo = MongoClient(server ,27017)
 mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
 rest = mongo.test.rest
 
 pipelines = []
 pipelines.append({'$match' : {'cuisine' : 'Brazilian'}})
 pipelines.append({'$group' : {'_id' : "$address.zipcode", 'cnt' : {'$sum' : 1}}})
+
+result = rest.aggregate(pipelines)
+for doc in result:
+    print doc
+
+
+"""find the most cuisine in the restaurant per borough"""
+mongo = MongoClient(server ,27017)
+mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
+rest = mongo.test.rest
+
+pipelines = []
+pipelines.append({'$group' :{'_id' : {'bo': '$borough', 'cu':'$cuisine'}, 'num' : {'$sum' : 1}}})
+pipelines.append({'$sort' : {'num' : -1}})
+pipelines.append({'$group' :{'_id' : '$_id.bo', 'best_cuisine' : {'$first':'$_id.cu'}, 'num' : {'$first':'$num'}}})
+
+result = rest.aggregate(pipelines)
+for doc in result:
+    print doc
+
+
+"""find the cusine getting high average score"""
+mongo = MongoClient(server ,27017)
+mongo.the_database.authenticate(mongo_account['id'], mongo_account['pw'], source = 'test')
+rest = mongo.test.rest
+
+pipelines = []
+pipelines.append({'$unwind' : '$grades'})
+pipelines.append({'$group' :{'_id' : '$cuisine', 'avgscore' : {'$avg' : '$grades.score'} } })
+pipelines.append({'$limit' : 1})
 
 result = rest.aggregate(pipelines)
 for doc in result:

@@ -35,15 +35,14 @@ class Major(Base):
 
 class Course(Base):
     __tablename__ = 'courses'
-    ############
-    Code            = Column(String(20), primary_key = True, nullable = False, unique = True)
+    ID              = Column(Integer, primary_key = True, nullable = False, autoincrement = True)
+    Code            = Column(String(20),  nullable = False)
     Name            = Column(String(100), nullable = False)
 
 class Score(Base):
     __tablename__ = 'scores'
 
     ID = Column(Integer, primary_key = True, nullable = False, autoincrement = True)
-    #######
     StudentID = Column(CHAR(30), nullable = False)
     CourseCode = Column(CHAR(30), nullable = False)
     Score = Column(Float, nullable = False, default = 0)

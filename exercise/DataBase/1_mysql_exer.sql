@@ -64,3 +64,16 @@ UPDATE students SET stID='A127' WHERE NAME='Amy';
 DELETE FROM students WHERE MajorCode is NULL;
 SELECT * FROM students;
 SELECT * FROM scores;
+
+
+
+#world database
+#GNP가 가장 높은 나라는?
+SELECT Name, GNP FROM country order by GNP DESC limit 1;
+#각 나라의 주요 도시별 평균 인구수는?
+SELECT co.Name, avg(ct.Population) FROM city ct JOIN country co ON ct.CountryCode = co.Code GROUP BY CountryCode;
+#기대수명이 평균보다 낮은 나라들의 평균 GNP는?
+SELECT Name, GNP FROM country WHERE LifeExpectancy <= (SELECT avg(LifeExpectancy) FROM country);
+SELECT avg(GNP) FROM country WHERE LifeExpectancy <= (SELECT avg(LifeExpectancy) FROM country);
+#각 나라에서 가장 많이 쓰는 언어와 비율
+SELECT co.Name, cl.Language, max(cl.Percentage) FROM countrylanguage cl JOIN country co ON co.Code = cl.CountryCode GROUP BY co.Name;

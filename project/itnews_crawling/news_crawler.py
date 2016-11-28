@@ -7,9 +7,13 @@ sys.setdefaultencoding('utf-8')
 
 import requests
 import re
+import datetime
 from bs4 import BeautifulSoup
 from cache_news import CacheNews
 from news_db import NewsDb
+
+today_1 = datetime.date.today()
+today = re.sub('-', '', today_1.isoformat())
 
 class NaverItNewsCrawler(object):
     def __init__(self, url, cachenews, newsdb):
@@ -24,7 +28,7 @@ class NaverItNewsCrawler(object):
 
         #while True:
         while page_num < 2:
-            response = requests.post('{}&mid=sec&mode=LSD&date=20161124&page={}'.format(self.url, page_num)) #itnews crawling
+            response = requests.post('{}&mid=sec&mode=LSD&date={}&page={}'.format(self.url, today, page_num)) #itnews crawling
             soup = BeautifulSoup(response.content)
 
             links = soup.find_all('a', attrs={'class' : 'nclicks(fls.list)'}) # news links
@@ -42,29 +46,35 @@ class NaverItNewsCrawler(object):
             else:
                 page_num += 1
 
+        self.newsdb.get_recent_news()
+
     def get_news_contents(self, url):
         response = requests.get(url)
         soup = BeautifulSoup(response.content)
 
         try: # if there is no response,
             news_url                = url
-            news_title              = soup.find('h3', attrs = {'id' : 'articleTitle'}).get_text()
-            news_contents_1         = soup.find('div', attrs = {'id' : 'articleBodyContents'}).get_text()
-            news_contents           = re.sub(r'^\s*//.*\n.*{}\n+', '', news_contents_1) # delete abnormal sentences
+            news_title              = str(soup.find('h3', attrs = {'id' : 'articleTitle'}).get_text())
+            news_contents_1         = str(soup.find('div', attrs = {'id' : 'articleBodyContents'}).get_text())
+            news_contents           = str(re.sub(r'^\s*//.*\n.*{}\n+', '', news_contents_1)) # delete abnormal sentences
             try:
-                news_company        = soup.select(".press_logo > a > img ")[0].attrs['title']
+                news_company        = str(soup.select(".press_logo > a > img ")[0].attrs['title'])
             except Exception as e:
                 news_company        = ''
             news_reporter_email_1   = re.findall(r'[\w.-]+@[\w.-]+', news_contents_1)
             try:
-                news_reporter_email = news_reporter_email_1[-1] # if there are some e-mail address
+                news_reporter_email = str(news_reporter_email_1[-1]) # if there are some e-mail address
             except Exception as e:
                 news_reporter_email = ''
             try:
-                news_date = soup.select('.t11')[0].get_text()
+                news_date_1 = str(soup.select('.t11')[0].get_text())
+                split_str = re.split(r'[-\s:]+', news_date_1)
+                split_int = map(int, split_str)
+                news_date = datetime.datetime(split_int[0], split_int[1], split_int[2], split_int[3], split_int[4])
             except Exception as e:
                 news_date = ''
 
+            print news_date
             self.newsdb.save_news(news_url, news_title, news_contents, news_company, news_reporter_email, news_date)
 
         except Exception as e:

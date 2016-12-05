@@ -31,9 +31,9 @@ class SimilarityDB(object):
         if self.get_item_similarity(item1, item2, insert_method) == 0:
             if insert_method == 'cosine':
                 insert_similarity = ImvelyItembasedSimilarity(Item1 = item1, Item2 = item2, Cossimilarity = items_similarity)
-            if insert_method == 'jaccard':
+            elif insert_method == 'jaccard':
                 insert_similarity = ImvelyItembasedSimilarity(Item1 = item1, Item2 = item2, Jacsimilarity = items_similarity)
-            if insert_method == 'Pearson':
+            elif insert_method == 'pearson':
                 insert_similarity = ImvelyItembasedSimilarity(Item1 = item1, Item2 = item2, Pearsimilarity = items_similarity)
             session.add(insert_similarity)
             session.commit()

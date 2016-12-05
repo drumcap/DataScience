@@ -155,6 +155,6 @@ if __name__ == '__main__':
     #result.get_similarity(model = 'user_based', method = cosine)
     #result.get_similarity(model = 'user_based', method = jaccard)
     #result.get_similarity(model = 'user_based', method = pearson)
-    result.get_similarity(model = 'item_based', method = cosine)
-    result.get_similarity(model = 'item_based', method = jaccard)
+    #result.get_similarity(model = 'item_based', method = cosine)
+    #result.get_similarity(model = 'item_based', method = jaccard)
     result.get_similarity(model = 'item_based', method = pearson)

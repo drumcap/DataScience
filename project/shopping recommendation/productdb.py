@@ -32,10 +32,11 @@ class ProductDB(object):
     def update_product_info(self, link, title, category):
         session = Session()
         update_product = session.query(ImvelyProduct).filter(ImvelyProduct.Link == link).one()
-        update_product.Name = title
-        update_product.Category = category
-        update_product.Enrolltime = crawltime
-        session.commit()
+        if update_product.Name != title:
+            update_product.Name = title
+            update_product.Category = category
+            update_product.Enrolltime = crawltime
+            session.commit()
         session.close()
 
 

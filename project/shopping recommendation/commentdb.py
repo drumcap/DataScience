@@ -5,7 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import ImvelyComment
+from model import ImvelyComment, ImvelyCosineSimilarity
 import datetime
 import re
 
@@ -29,9 +29,10 @@ class CommentDB(object):
     def update_comment_info(self, product_link, comment_writer, comment_grade):
         session = Session()
         update_comment = session.query(ImvelyComment).filter(ImvelyComment.Link == product_link, ImvelyComment.Writer == comment_writer).one()
-        update_comment.Grade = comment_grade
-        update_comment.Enrolltime = crawltime
-        session.commit()
+        if update_comment.Grade != comment_grade:
+            update_comment.Grade = comment_grade
+            update_comment.Enrolltime = crawltime
+            session.commit()
         session.close()
 
 

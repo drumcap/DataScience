@@ -51,7 +51,7 @@ class PredictScore(ojbect):
                         for similar_user in self.itemvector[item_link].keys():
                             if similar_user == user:
                                 continue
-                            between_similarity = self.similaritydb.get_user_similarity(similar_user, user, method)
+                            between_similarity = self.similaritydb.get_user_similarity(similar_user, user, method, value = True)
                             temp_score += self.itemvector[item_link][similar_user] * between_similarity
                             temp_sim_sum += between_similarity
                 if not user in test_uservector.keys():
@@ -76,7 +76,7 @@ class PredictScore(ojbect):
                         for similar_item in self.blank_uservector[writer].keys():
                             if similar_item == item:
                                 continue
-                            between_similarity = self.similaritydb.get_item_similarity(similar_item, item, method)
+                            between_similarity = self.similaritydb.get_item_similarity(similar_item, item, method, value = True)
                             temp_score += self.blank_uservector[writer][similar_item] * between_similarity
                             temp_sim_sum += between_similarity
                 if not user in test_uservector.keys():

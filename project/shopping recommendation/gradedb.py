@@ -19,12 +19,9 @@ class GradeDB(object):
     def get_uservector(self, traintestcategory, blank = True):
         session = Session()
         user_vector = {}
-        #grade_dict = {}
 
         if traintestcategory == 'train':
             product_zip = self.product_train
-            #self.blank_comment_writer = []
-            #self.blank_comment_link = []
 
         elif traintestcategory=='test':
             product_zip = self.product_test

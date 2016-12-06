@@ -38,7 +38,7 @@ def jaccard(grades1, grades2):
         return 0
     return float(min_sum / max_sum)
 
-
+'''
 def pearson2(grades1, grades2):
     count_key = len(grades1.keys())
     for product_link in grades2.keys():
@@ -59,6 +59,7 @@ def pearson2(grades1, grades2):
     if denominator == 0:
         return 0
     return float(numerator / denominator)
+'''
 
 def pearson(grades1, grades2):
     temp_grades1 = grades1
@@ -90,23 +91,21 @@ class BatchModel(object):
         self.uservector = self.gradedb.get_uservector('train', blank = False)
         self.similaritydb = similaritydb
         self.itemvector = self.gradedb.get_itemvector()
-        self.insert_method = None
 
-    def get_similarity(self, model, method):
-        if method == cosine:
-            self.insert_method = 'cosine'
-        elif method == jaccard:
-            self.insert_method = 'jaccard'
-        elif method == pearson:
-            self.insert_method = 'pearson'
-
-        #self.similaritydb.reset_similarity(model, self.insert_method)
+    def get_similarity(self, model, method, part):
 
         if model == 'user_based':
             users = self.uservector.keys()
+            users.sort()
+            divide = len(users) / 5
+
+            divided_users = users[(part-1) * divide : part * divide]
+            if part == 5:
+                divided_users = users[(part-1) * divide : ]
+
             existing_user = []
 
-            for user1 in users:
+            for user1 in divided_users:
                 existing_user.append(user1)
                 for user2 in users:
                     if user2 in existing_user:
@@ -115,7 +114,7 @@ class BatchModel(object):
                         users_similarity = method(self.uservector[user1], self.uservector[user2])
                         if users_similarity != 0:
                             print user1, user2, users_similarity
-                            self.insert_similarity(user1, user2, users_similarity, model, self.insert_method)
+                            self.insert_similarity(user1, user2, users_similarity, model, method.func_name)
 
         elif model == 'item_based':
             items = self.itemvector.keys()
@@ -130,19 +129,19 @@ class BatchModel(object):
                         items_similarity = method(self.itemvector[item1], self.itemvector[item2])
                         if items_similarity != 0:
                             print item1, item2, items_similarity
-                            self.insert_similarity(item1, item2, items_similarity, model, self.insert_method)
+                            self.insert_similarity(item1, item2, items_similarity, model, method.func_name)
 
 
-    def insert_similarity(self, item1, item2, items_similarity, model, insert_method):
+    def insert_similarity(self, item1, item2, items_similarity, model, func_name):
         if model == 'user_based':
             try:
-                self.similaritydb.save_user_similarity(item1, item2, items_similarity, insert_method)
+                self.similaritydb.save_user_similarity(item1, item2, items_similarity, func_name)
             except Exception as e:
                     print e
 
         elif model == 'item_based':
             try:
-                self.similaritydb.save_item_similarity(item1, item2, items_similarity, insert_method)
+                self.similaritydb.save_item_similarity(item1, item2, items_similarity, func_name)
             except Exception as e:
                     print e
 
@@ -152,9 +151,20 @@ if __name__ == '__main__':
     similaritydb = SimilarityDB()
 
     result = BatchModel(gradedb, similaritydb)
-    #result.get_similarity(model = 'user_based', method = cosine)
-    #result.get_similarity(model = 'user_based', method = jaccard)
+    result.get_similarity(model = 'user_based', method = cosine, part = 1)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 2)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 3)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 4)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 5)
+
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 1)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 2)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 3)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 4)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 5)
+
     #result.get_similarity(model = 'user_based', method = pearson)
+
     #result.get_similarity(model = 'item_based', method = cosine)
     #result.get_similarity(model = 'item_based', method = jaccard)
-    result.get_similarity(model = 'item_based', method = pearson)
+    #result.get_similarity(model = 'item_based', method = pearson)

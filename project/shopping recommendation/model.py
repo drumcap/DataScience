@@ -32,26 +32,6 @@ class ImvelyComment(Base):
     Enrolltime = Column(Date, nullable = True)
 
 
-class ImvelyUserbasedSimilarity(Base):
-    __tablename__ = 'imvelyuserbasedsimilarity2' #imveleycosinesimilarity must be changed in databse.
-
-    Id = Column(Integer, primary_key = True, nullable = False, autoincrement = True)
-    User1 = Column(CHAR(50), nullable = False)
-    User2 = Column(CHAR(50), nullable = False)
-    Cossimilarity = Column(Float, nullable = True)
-    Jacsimilarity = Column(Float, nullable = True)
-    Pearsimilarity = Column(Float, nullable = True)
-
-class ImvelyItembasedSimilarity(Base):
-    __tablename__ = 'imvelyitembasedsimilarity2'
-
-    Id = Column(Integer, primary_key = True, nullable = False, autoincrement = True)
-    Item1 = Column(CHAR(200), nullable = False)
-    Item2 = Column(CHAR(200), nullable = False)
-    Cossimilarity = Column(Float, nullable = True)
-    Jacsimilarity = Column(Float, nullable = True)
-    Pearsimilarity = Column(Float, nullable = True)
-
 class ImvelyBlankComment(Base):
     __tablename__ = 'imvelyblankcomments2'
 

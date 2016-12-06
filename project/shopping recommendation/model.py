@@ -13,8 +13,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class ImvelyProduct(Base):
-    __tablename__ = 'imvelyproducts2'
+class Product(Base):
+    __tablename__ = 'products'
 
     Link = Column(CHAR(200), primary_key = True, nullable = False)
     Name = Column(CHAR(200), nullable = False)
@@ -22,8 +22,8 @@ class ImvelyProduct(Base):
     Enrolltime = Column(Date, nullable = True)
 
 
-class ImvelyComment(Base):
-    __tablename__ = 'imvelycomments2'
+class Comment(Base):
+    __tablename__ = 'comments'
 
     Id = Column(Integer, primary_key = True, autoincrement = True, nullable = False)
     Link = Column(CHAR(200), nullable = False)
@@ -32,8 +32,8 @@ class ImvelyComment(Base):
     Enrolltime = Column(Date, nullable = True)
 
 
-class ImvelyBlankComment(Base):
-    __tablename__ = 'imvelyblankcomments2'
+class Blank(Base):
+    __tablename__ = 'blanks'
 
     Id = Column(Integer, primary_key = True, autoincrement = True, nullable = False)
     Link = Column(CHAR(200), nullable = False)

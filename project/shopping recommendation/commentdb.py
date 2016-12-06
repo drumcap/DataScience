@@ -5,7 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import ImvelyComment, ImvelyCosineSimilarity
+from model import Comment
 import datetime
 import re
 
@@ -19,7 +19,7 @@ class CommentDB(object):
     def save_comment_info(self, product_link, comment_writer, comment_grade):
         if self.get_comment_info(product_link, comment_writer):
             session = Session()
-            insert_comment = ImvelyComment(Link = product_link, Writer = comment_writer, Grade = comment_grade, Enrolltime = crawltime)
+            insert_comment = Comment(Link = product_link, Writer = comment_writer, Grade = comment_grade, Enrolltime = crawltime)
             session.add(insert_comment)
             session.commit()
             session.close()
@@ -28,7 +28,7 @@ class CommentDB(object):
 
     def update_comment_info(self, product_link, comment_writer, comment_grade):
         session = Session()
-        update_comment = session.query(ImvelyComment).filter(ImvelyComment.Link == product_link, ImvelyComment.Writer == comment_writer).one()
+        update_comment = session.query(Comment).filter(Comment.Link == product_link, Comment.Writer == comment_writer).one()
         if update_comment.Grade != comment_grade:
             update_comment.Grade = comment_grade
             update_comment.Enrolltime = crawltime
@@ -38,7 +38,7 @@ class CommentDB(object):
 
     def get_comment_info(self, product_link, comment_writer):
         session = Session()
-        find_comment = session.query(ImvelyComment).filter(ImvelyComment.Link == product_link, ImvelyComment.Writer == comment_writer).all()
+        find_comment = session.query(Comment).filter(Comment.Link == product_link, Comment.Writer == comment_writer).all()
 
         if find_comment:
             return False

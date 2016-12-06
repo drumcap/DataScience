@@ -6,7 +6,7 @@ sys.setdefaultencoding('utf-8')
 
 
 from connection import Session
-from model import ImvelyProduct
+from model import Product
 import datetime
 import re
 
@@ -21,7 +21,7 @@ class ProductDB(object):
     def save_product_info(self, link, title, category):
         if self.get_product_id(link):
             session = Session()
-            insert_product = ImvelyProduct(Link = link, Name = title, Category = category, Enrolltime = crawltime)
+            insert_product = Product(Link = link, Name = title, Category = category, Enrolltime = crawltime)
             session.add(insert_product)
             session.commit()
             session.close()
@@ -31,7 +31,7 @@ class ProductDB(object):
 
     def update_product_info(self, link, title, category):
         session = Session()
-        update_product = session.query(ImvelyProduct).filter(ImvelyProduct.Link == link).one()
+        update_product = session.query(Product).filter(Product.Link == link).one()
         if update_product.Name != title:
             update_product.Name = title
             update_product.Category = category
@@ -42,7 +42,7 @@ class ProductDB(object):
 
     def get_product_id(self, link):
         session = Session()
-        find_product = session.query(ImvelyProduct).filter(ImvelyProduct.Link == link).all()
+        find_product = session.query(Product).filter(Product.Link == link).all()
 
         if find_product:
             return False
@@ -55,7 +55,7 @@ class ProductDB(object):
 
     def get_product_link(self):
         session = Session()
-        find_product_link = session.query(ImvelyProduct).all()
+        find_product_link = session.query(Product).all()
 
         result = [row.Link for row in find_product_link]
 

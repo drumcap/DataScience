@@ -5,7 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import ImvelyComment, ImvelyProduct, ImvelyBlankComment
+from model import Comment
 from traintestdb import TrainTestDB
 
 class GradeDB(object):
@@ -27,7 +27,7 @@ class GradeDB(object):
             product_zip = self.product_test
 
         for traintestlink in product_zip:
-            grades_list = session.query(ImvelyComment).filter(ImvelyComment.Link == traintestlink.Link).all()
+            grades_list = session.query(Comment).filter(Comment.Link == traintestlink.Link).all()
 
             for user_grade in grades_list:
                 if blank == True:
@@ -50,7 +50,7 @@ class GradeDB(object):
         session = Session()
         item_vector = {}
 
-        grades_list = session.query(ImvelyComment).all()
+        grades_list = session.query(Comment).all()
 
         for user_grade in grades_list:
             if (user_grade.Link, user_grade.Writer) in self.blank_comment_set:

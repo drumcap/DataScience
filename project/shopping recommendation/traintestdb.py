@@ -5,7 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import ImvelyComment, ImvelyProduct, ImvelyBlankComment
+from model import Comment, Product, Blank
 import random
 from sqlalchemy import distinct
 
@@ -17,13 +17,13 @@ class TrainTestDB(object):
     def product_train_test_set(self):
         session = Session()
 
-        product_num_1 = session.query(ImvelyProduct).all()
+        product_num_1 = session.query(Product).all()
         product_num = len(product_num_1)
         product_train_num = int(0.9 * product_num)
         product_test_num = product_num - product_train_num
 
-        self.product_train = session.query(ImvelyProduct).order_by(ImvelyProduct.Enrolltime, ImvelyProduct.Link).slice(0, product_train_num).all()
-        self.product_test  = session.query(ImvelyProduct).order_by(ImvelyProduct.Enrolltime, ImvelyProduct.Link).slice(product_train_num, product_num+1).all()
+        self.product_train = session.query(Product).order_by(Product.Enrolltime, Product.Link).slice(0, product_train_num).all()
+        self.product_test  = session.query(Product).order_by(Product.Enrolltime, Product.Link).slice(product_train_num, product_num+1).all()
         session.close()
 
         return self.product_train, self.product_test
@@ -32,14 +32,14 @@ class TrainTestDB(object):
 
         self.product_train_test_set()
         session = Session()
-        session.query(ImvelyBlankComment).delete()
+        session.query(Blank).delete()
 
         for test_link in self.product_test:
-            grades_list = session.query(ImvelyComment).filter(ImvelyComment.Link == test_link.Link).all()
+            grades_list = session.query(Comment).filter(Comment.Link == test_link.Link).all()
             blank_comment_num = random.sample(range(len(grades_list)), 1)
             print grades_list[blank_comment_num[0]].Link, grades_list[blank_comment_num[0]].Writer
 
-            insert_blank_index = ImvelyBlankComment(Link = grades_list[blank_comment_num[0]].Link, Writer = grades_list[blank_comment_num[0]].Writer)
+            insert_blank_index = Blank(Link = grades_list[blank_comment_num[0]].Link, Writer = grades_list[blank_comment_num[0]].Writer)
             session.add(insert_blank_index)
             session.commit()
 
@@ -51,7 +51,7 @@ class TrainTestDB(object):
         blank_comment_set = []
 
         session = Session()
-        blank_zip = session.query(ImvelyBlankComment).all()
+        blank_zip = session.query(Blank).all()
         if blank_zip:
             for blank_comment in blank_zip:
                 blank_comment_set.append((blank_comment.Link, blank_comment.Writer))
@@ -62,5 +62,5 @@ class TrainTestDB(object):
 
     def get_user_list(self):
         session = Session()
-        user_list = session.query(distinct(ImvelyComment.Writer)).all()
+        user_list = session.query(distinct(Comment.Writer)).all()
         return user_list

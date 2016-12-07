@@ -4,12 +4,12 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-from connection import Session, mongo
+from connection import Session, Mongo
 
 class SimilarityDB(object):
     def __init__(self):
-        self.usersim = mongo.imvely.userbasedsimilarity
-        self.itemsim = mongo.imvely.itembasedsimilarity
+        self.usersim = Mongo.userbasedsimilarity
+        self.itemsim = Mongo.itembasedsimilarity
 
     def save_user_similarity(self, user1, user2, users_similarity, method):
         if self.get_user_similarity(user1, user2, method, value = False) == 0:

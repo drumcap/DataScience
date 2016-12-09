@@ -6,7 +6,7 @@ sys.setdefaultencoding('utf-8')
 
 from traintestdb import TrainTestDB
 from similaritydb import SimilarityDB
-from gradedb2 import GradeDB
+from gradedb import GradeDB
 
 class SetModel(object):
     def __init__(self, traintestdb, similaritydb):
@@ -14,16 +14,17 @@ class SetModel(object):
         self.similaritydb = similaritydb
 
     def set_model(self):
-        self.traintestdb.make_blank_test_set()
+        self.traintestdb.product_train_test_set()
+        self.traintestdb.user_train_test_set()
+        print self.traintestdb.get_blank_set(value = True)
         self.similaritydb.reset_similarity()
 
+        self.set_vector()
 
     def set_vector(self):
         gradedb = GradeDB()
         gradedb.delete_vector()
-        gradedb.save_uservector("train", blank = False)
-        gradedb.save_uservector("test", blank = True)
-        gradedb.save_uservector("test", blank = False)
+        gradedb.save_uservector()
         gradedb.save_itemvector()
 
 if __name__ == '__main__':
@@ -32,4 +33,3 @@ if __name__ == '__main__':
 
     result = SetModel(traintestdb, similaritydb)
     result.set_model()
-    result.set_vector()

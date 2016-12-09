@@ -4,7 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-from connection import Session
+from connection import Session, Mongo
 from model import Comment
 from traintestdb import TrainTestDB
 from sqlalchemy import distinct
@@ -17,7 +17,7 @@ class GradeDB(object):
         self.blank_comment_set = self.traintestdb.get_blank_test_set()
 
 
-    def get_uservector(self, traintestcategory, blank = True):
+    def save_uservector(self, traintestcategory, blank = True):
         session = Session()
         user_vector = {}
 
@@ -38,16 +38,17 @@ class GradeDB(object):
                 user = user_grade.Writer
                 if not user in user_vector.keys():
                     grade_dict = {}
-                    grade_dict[user_grade.ProductNo] = user_grade.Grade
+                    grade_dict[str(user_grade.ProductNo)] = int(user_grade.Grade)
                     user_vector[user] = grade_dict
                 else:
-                    user_vector[user][user_grade.ProductNo] = user_grade.Grade
+                    user_vector[user][str(user_grade.ProductNo)] = int(user_grade.Grade)
 
         session.close()
 
-        return user_vector
+        Mongo.vector.insert_one({'cat' : 'user', 'cat2' : traintestcategory, 'blank' : blank, 'vector': user_vector})
+        print "saved"
 
-    def get_itemvector(self):
+    def save_itemvector(self):
         session = Session()
         item_vector = {}
 
@@ -57,19 +58,33 @@ class GradeDB(object):
             if (user_grade.ProductNo, user_grade.Writer) in self.blank_comment_set:
                 continue
 
-            item = user_grade.ProductNo
+            item = str(user_grade.ProductNo)
             if not item in item_vector.keys():
                 grade_dict = {}
-                grade_dict[user_grade.Writer] = user_grade.Grade
+                grade_dict[user_grade.Writer] = int(user_grade.Grade)
                 item_vector[item] = grade_dict
             else:
-                item_vector[item][user_grade.Writer] = user_grade.Grade
+                item_vector[item][user_grade.Writer] = int(user_grade.Grade)
 
         session.close()
-        return item_vector
+        Mongo.vector.insert_one({'cat' : 'item', 'vector': item_vector})
+        print "saved"
 
+    def get_itemvector(self):
+        result = Mongo.vector.find_one({"cat" : 'item'})['vector']
+        return result
+
+    def get_uservector(self, traintestcategory, blank):
+        result = Mongo.vector.find_one({'cat' : 'user', 'cat2' : traintestcategory, 'blank' : blank})['vector']
+        return result
+
+    def delete_vector(self):
+        Mongo.vector.drop()
+        print "deleted"
 
     def get_user_list(self):
         session = Session()
-        user_list = session.query(distinct(Comment.Writer)).all()
+        user_list = []
+        for users in  session.query(distinct(Comment.Writer)).all():
+            user_list.append(users[0])
         return user_list

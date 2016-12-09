@@ -21,7 +21,7 @@ class ProductDB(object):
     def save_product_info(self, productno, link, title, category):
         if self.get_product_id(productno):
             session = Session()
-            insert_product = Product(ProductNo = productno, Link = link, Name = title, Category = category, Enrolltime = crawltime)
+            insert_product = Product(ProductNo = productno, Link = link, Name = title, Category = category, TrainTest = 'train' ,Enrolltime = crawltime)
             session.add(insert_product)
             session.commit()
             session.close()
@@ -36,6 +36,7 @@ class ProductDB(object):
             update_product.Name = title
             update_product.Link = link
             update_product.Category = category
+            update_product.TrainTest = 'train'
             update_product.Enrolltime = crawltime
             session.commit()
         session.close()

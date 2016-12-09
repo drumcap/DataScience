@@ -13,20 +13,35 @@ class TrainTestDB(object):
     def __init__(self):
         self.product_train = None
         self.product_test = None
+        self.user_train = None
+        self.user_test = None
 
     def product_train_test_set(self):
         session = Session()
 
         product_num_1 = session.query(Product).all()
         product_num = len(product_num_1)
-        product_train_num = int(0.9 * product_num)
+        product_train_num = int(0.95 * product_num)
         product_test_num = product_num - product_train_num
 
-        self.product_train = session.query(Product).order_by(Product.Enrolltime, Product.Link).slice(0, product_train_num).all()
-        self.product_test  = session.query(Product).order_by(Product.Enrolltime, Product.Link).slice(product_train_num, product_num+1).all()
+        self.product_train = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(0, product_train_num).all()
+        self.product_test  = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(product_train_num, product_num+1).all()
         session.close()
 
         return self.product_train, self.product_test
+
+    def get_user_list(self):
+        session = Session()
+        user_list = []
+        for users in  session.query(distinct(Comment.Writer)).all():
+            user_list.append(users[0])
+        return user_list
+
+
+
+
+
+
 
     def make_blank_test_set(self):
 
@@ -35,11 +50,11 @@ class TrainTestDB(object):
         session.query(Blank).delete()
 
         for test_link in self.product_test:
-            grades_list = session.query(Comment).filter(Comment.Link == test_link.Link).all()
+            grades_list = session.query(Comment).filter(Comment.ProductNo == test_link.ProductNo).all()
             blank_comment_num = random.sample(range(len(grades_list)), 1)
-            print grades_list[blank_comment_num[0]].Link, grades_list[blank_comment_num[0]].Writer
+            print grades_list[blank_comment_num[0]].ProductNo, grades_list[blank_comment_num[0]].Writer
 
-            insert_blank_index = Blank(Link = grades_list[blank_comment_num[0]].Link, Writer = grades_list[blank_comment_num[0]].Writer)
+            insert_blank_index = Blank(ProductNo = grades_list[blank_comment_num[0]].ProductNo, Writer = grades_list[blank_comment_num[0]].Writer)
             session.add(insert_blank_index)
             session.commit()
 
@@ -54,13 +69,25 @@ class TrainTestDB(object):
         blank_zip = session.query(Blank).all()
         if blank_zip:
             for blank_comment in blank_zip:
-                blank_comment_set.append((blank_comment.Link, blank_comment.Writer))
+                blank_comment_set.append((blank_comment.ProductNo, blank_comment.Writer))
         session.close()
 
         return blank_comment_set
 
+    def get_test_item(self):
+        self.product_train_test_set()
+        item_list = []
+        for test_link in self.product_test:
+            item_list.append(str(test_link.ProductNo))
 
+        return item_list
+
+
+    '''
     def get_user_list(self):
         session = Session()
-        user_list = session.query(distinct(Comment.Writer)).all()
+        user_list = []
+        for users in  session.query(distinct(Comment.Writer)).all():
+            user_list.append(users[0])
         return user_list
+    '''

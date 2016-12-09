@@ -4,21 +4,20 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-from gradedb2 import GradeDB
+from gradedb import GradeDB
 from similaritydb import SimilarityDB
 from traintestdb import TrainTestDB
 
 class PredictScore(object):
     def __init__(self, gradedb, similaritydb, traintestdb):
         self.gradedb = gradedb
-        self.blank_uservector = self.gradedb.get_uservector('test', blank = True)
-        self.correct_uservector = self.gradedb.get_uservector('test', blank = False)
         self.similaritydb = similaritydb
-        self.itemvector = self.gradedb.get_itemvector()
         self.traintestdb = traintestdb
-        self.blank_comment_set = self.traintestdb.get_blank_test_set()
-        self.item_list = self.traintestdb.get_test_item()
-        self.user_list = self.traintestdb.get_user_list()
+        self.item_list = self.traintestdb.get_item_list('test')
+        self.user_list = self.traintestdb.get_user_list('test')
+        self.itemvector = self.gradedb.get_vector('item')
+        self.uservector = self.gradedb.get_vector('user')
+        self.blank_comment_set = self.traintestdb.get_blank_set(value = False)
 
     def get_score(self, model, method):
         if model == 'user_based':
@@ -49,11 +48,10 @@ class PredictScore(object):
                 for item_link in self.itemvector.keys():
                     if item == item_link:
                         for similar_user in self.itemvector[item_link].keys():
-                            if similar_user == user:
-                                continue
                             between_similarity = self.similaritydb.get_user_similarity(similar_user, user, method, value = True)
                             temp_score += self.itemvector[item_link][similar_user] * between_similarity
                             temp_sim_sum += between_similarity
+
                 if not user in test_uservector.keys():
                     temp_dict = {}
                     if temp_sim_sum == 0:
@@ -66,9 +64,8 @@ class PredictScore(object):
                         test_uservector[user][item] = float(temp_score)
                     else:
                         test_uservector[user][item] = float(temp_score) / float(temp_sim_sum)
+
         return self.get_mae(test_uservector), self.get_recall(test_uservector), self.get_precision(test_uservector)
-
-
 
     def get_item_score(self, method):
         test_uservector = {}
@@ -76,14 +73,11 @@ class PredictScore(object):
             for item in self.item_list:
                 temp_score = 0
                 temp_sim_sum = 0
-
-                for similar_item in self.itemvector.keys():
-                    if similar_item == item:
-                        continue
-                    for writer in self.itemvector[similar_item].keys():
-                        if writer == user:
+                for writer in self.uservector.keys():
+                    if writer == user:
+                        for similar_item in self.uservector[writer].keys():
                             between_similarity = self.similaritydb.get_item_similarity(similar_item, item, method, value = True)
-                            temp_score += self.itemvector[similar_item][writer] * between_similarity
+                            temp_score += self.uservector[writer][similar_item] * between_similarity
                             temp_sim_sum += between_similarity
 
                 if not user in test_uservector.keys():
@@ -111,10 +105,9 @@ class PredictScore(object):
                 for item_link in self.itemvector.keys():
                     if item == item_link:
                         for similar_user in self.itemvector[item_link].keys():
-                            if similar_user == user:
-                                continue
                             temp_score += self.itemvector[item_link][similar_user]
                             temp_sum += 1
+
                 if not user in test_uservector.keys():
                     temp_dict = {}
                     if temp_sum == 0:
@@ -135,18 +128,18 @@ class PredictScore(object):
         print test_uservector
         temp_count = 0
         temp_sum = 0
-        for link_writer in self.blank_comment_set:
+        for iugrade in self.blank_comment_set:
             temp_count += 1
-            correct_grade = self.correct_uservector[link_writer[1]][str(link_writer[0])]
-            estimated_grade = test_uservector[link_writer[1]][str(link_writer[0])]
+            correct_grade = iugrade[2]
+            estimated_grade = test_uservector[iugrade[1]][str(iugrade[0])]
             temp_val = abs(correct_grade - estimated_grade)
             temp_sum += temp_val
-            #print correct_grade, estimated_grade
+            print "correct grade is {} estimated grade is {}".format(correct_grade, estimated_grade)
         mae_val = float(temp_sum) / float(temp_count)
         return mae_val
 
     def get_recall(self, test_uservector):
-        nouse, expected, intersect = self.get_fds(test_uservector)
+        no_use, expected, intersect = self.get_fds(test_uservector)
         if len(expected) > 0:
             recall_value = float(len(intersect)) / float(len(expected))
             return recall_value
@@ -155,7 +148,7 @@ class PredictScore(object):
 
 
     def get_precision(self, test_uservector):
-        expect, nouse, intersect = self.get_fds(test_uservector)
+        expect, no_use, intersect = self.get_fds(test_uservector)
         if len(expect) > 0:
             precision_value = float(len(intersect)) / float(len(expect))
             return precision_value
@@ -171,20 +164,21 @@ class PredictScore(object):
         for test_user in test_uservector.keys():
             for test_item in test_uservector[test_user].keys():
                 if test_uservector[test_user][test_item] >= 4:
-                    if test_user in self.blank_uservector:
-                        if test_item in self.blank_uservector[test_user]:
+                    for iugrade in self.blank_comment_set:
+                        if test_user == iugrade[1] and test_item == iugrade[0]:
                             continue
                     expect_user_tuple.append((test_user, test_item))
 
 
-        for link_writer in self.blank_comment_set:
-            if self.correct_uservector[link_writer[1]][str(link_writer[0])] >= 4:
-                expected_user_tuple.append((link_writer[1], str(link_writer[0])))
+        for iugrade in self.blank_comment_set:
+            if iugrade[2] >= 4:
+                expected_user_tuple.append((iugrade[1], str(iugrade[0])))
 
         for user_tuple in expect_user_tuple:
             if user_tuple in expected_user_tuple:
                 intersect_user_tuple.append(user_tuple)
-        print expect_user_tuple, expected_user_tuple
+
+        print "estimating tuple is {} and correct tuple is {}".format(expect_user_tuple, expected_user_tuple) 
         return expect_user_tuple, expected_user_tuple, intersect_user_tuple
 
 

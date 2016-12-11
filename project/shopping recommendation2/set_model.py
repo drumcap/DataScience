@@ -16,10 +16,12 @@ class SetModel(object):
     def set_model(self):
         self.traintestdb.product_train_test_set()
         self.traintestdb.user_train_test_set()
-        print self.traintestdb.get_blank_set(value = True)
-        self.similaritydb.reset_similarity()
 
-        self.set_vector()
+        self.similaritydb.reset_similarity()
+        if self.traintestdb.get_blank_set(value = True) > 10:
+            self.set_vector()
+        else:
+            self.set_model()
 
     def set_vector(self):
         gradedb = GradeDB()

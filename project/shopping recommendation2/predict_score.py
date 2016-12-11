@@ -51,7 +51,7 @@ class PredictScore(object):
                             between_similarity = self.similaritydb.get_user_similarity(similar_user, user, method, value = True)
                             temp_score += self.itemvector[item_link][similar_user] * between_similarity
                             temp_sim_sum += between_similarity
-
+                            print 'userbased : testvector is {}, {} and similar is {}, {}'.format(user, item, similar_user, item_link)
                 if not user in test_uservector.keys():
                     temp_dict = {}
                     if temp_sim_sum == 0:
@@ -79,7 +79,7 @@ class PredictScore(object):
                             between_similarity = self.similaritydb.get_item_similarity(similar_item, item, method, value = True)
                             temp_score += self.uservector[writer][similar_item] * between_similarity
                             temp_sim_sum += between_similarity
-
+                            print 'itembased : testvector is {}, {} and similar is {}, {}'.format(user, item, writer, similar_item)
                 if not user in test_uservector.keys():
                     temp_dict = {}
                     if temp_sim_sum == 0:
@@ -107,7 +107,7 @@ class PredictScore(object):
                         for similar_user in self.itemvector[item_link].keys():
                             temp_score += self.itemvector[item_link][similar_user]
                             temp_sum += 1
-
+                            print 'popularitybased : testvector is {}, {} and similar is {}, {}'.format(user, item, similar_user, item_link)
                 if not user in test_uservector.keys():
                     temp_dict = {}
                     if temp_sum == 0:
@@ -178,7 +178,7 @@ class PredictScore(object):
             if user_tuple in expected_user_tuple:
                 intersect_user_tuple.append(user_tuple)
 
-        print "estimating tuple is {} and correct tuple is {}".format(expect_user_tuple, expected_user_tuple) 
+        print "estimating tuple is {} and correct tuple is {}".format(expect_user_tuple, expected_user_tuple)
         return expect_user_tuple, expected_user_tuple, intersect_user_tuple
 
 
@@ -189,10 +189,10 @@ if __name__ == '__main__':
     traintestdb = TrainTestDB()
     result = PredictScore(gradedb, similaritydb, traintestdb)
 
-    result.get_score(model = 'user_based', method = 'cosine')
+    #result.get_score(model = 'user_based', method = 'cosine')
     #result.get_score(model = 'user_based', method = 'pearson')
     #result.get_score(model = 'user_based', method = 'jaccard')
     result.get_score(model = 'item_based', method = 'cosine')
     #result.get_score(model = 'item_based', method = 'jaccard')
     #result.get_score(model = 'item_based', method = 'pearson')
-    result.get_score(model = 'popularity_based', method = None)
+    #result.get_score(model = 'popularity_based', method = None)

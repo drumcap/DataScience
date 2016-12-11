@@ -17,7 +17,7 @@ class TrainTestDB(object):
         session = Session()
 
         product_num = session.query(Product).count()
-        product_train_num = int(0.9 * int(product_num))
+        product_train_num = int(0.95 * int(product_num))
         product_test_num = product_num - product_train_num
 
         product_train_list = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(0, product_train_num).all()
@@ -44,8 +44,11 @@ class TrainTestDB(object):
                 session.commit()
         print 'reset'
         user_num = session.query(User).count()
-        user_test_num = int(0.3 * int(user_num))
+        user_test_num = int(0.05 * int(user_num))
+        print user_test_num
+
         for row in session.query(User).order_by(func.rand()).limit(user_test_num):
+            print row.UserId
             row.TrainTest = 'test'
             session.commit()
         session.close()
@@ -70,18 +73,17 @@ class TrainTestDB(object):
         return user_list
 
     def get_blank_set(self, value):
-        test_item = self.get_item_list('test')
-        test_user = self.get_user_list('test')
+        print 'find blank set'
         blank_set = []
         blank_count = 0
         session = Session()
-        for item in test_item:
-            for user in test_user:
-                result = session.query(Comment).filter(Comment.ProductNo == item, Comment.Writer == user).all()
-                if result:
-                    blank_set.append((item, user, result[0].Grade))
-                    blank_count += 1
+        result = session.query(Comment).join(Product, Product.ProductNo == Comment.ProductNo).join(User, User.UserId == Comment.Writer).filter(User.TrainTest == 'test', Product.TrainTest == 'test').all()
+        if result:
+            for row in result:
+                blank_set.append((row.ProductNo, row.Writer, row.Grade))
+                blank_count += 1
+                print 'item is {}, user is {} counting {}'.format(row.ProductNo, row.Writer, blank_count)
         if value:
-            return blank_set, blank_count
+            return blank_count
         else:
             return blank_set

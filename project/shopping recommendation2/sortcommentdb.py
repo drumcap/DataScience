@@ -26,7 +26,7 @@ class SortCommentDB(object):
 
     def make_user_list(self):
         session = Session()
-        for row in session.query(Comment.Writer, func.count(Comment)).group_by(Comment.Writer).all():
+        for row in session.query(Comment.Writer, func.count(Comment.Id)).group_by(Comment.Writer).all():
             if not self.get_userid(row[0]):
                 insert_user = User(UserId = row[0], TrainTest = 'train', Written = int(row[1]))
                 session.add(insert_user)
@@ -52,3 +52,6 @@ class SortCommentDB(object):
         session.commit()
         session.close()
         print 'updated'
+
+result = SortCommentDB()
+result.make_user_list()

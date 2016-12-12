@@ -46,7 +46,7 @@ class CrawlImvely(object):
                 link_1 = name.select('> a')
                 link = link_1[0]['href']
                 productno_1 = re.search(r'product_no=\d*', link).group()
-                productno = int(re.sub(r'product_no=', '', productno_1))
+                productno = str(re.sub(r'product_no=', '', productno_1))
                 title_1 = name.select('> a > span')[0].get_text()
                 title = title_1.encode('utf-8')
                 print title

@@ -52,6 +52,3 @@ class SortCommentDB(object):
         session.commit()
         session.close()
         print 'updated'
-
-result = SortCommentDB()
-result.make_user_list()

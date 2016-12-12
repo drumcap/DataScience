@@ -8,14 +8,17 @@ sys.setdefaultencoding('utf-8')
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
+import random
 from productdb import ProductDB
 from commentdb import CommentDB
-
+from sortcommentdb import SortCommentDB
 
 class CrawlComment(object):
-    def __init__(self, productdb, commentdb):
+    def __init__(self, productdb, commentdb, sortcommentdb):
         self.productdb = productdb
         self.commentdb = commentdb
+        self.sortcommentdb = sortcommentdb
         self.product_links = self.productdb.get_product_link()
 
     def crawl_products_comments(self):
@@ -31,6 +34,9 @@ class CrawlComment(object):
 
         widget_url = 'http://widgets1.cre.ma/imvely.com/products/reviews?app=0&iframe_id=crema-product-reviews-2&order=20&page={}&parent_url={}&product_code={}'.format(pagenum, product_link, product_code)
         print widget_url
+
+        sec = random.random()
+        time.sleep(sec)
 
         response = requests.get(widget_url)
         soup = BeautifulSoup(response.content)
@@ -66,22 +72,15 @@ class CrawlComment(object):
             print e
 
 
-            """
-            comment_div_2 = comment.find('div', attrs = {'class' : 'review-content'})
-            print comment
-            comment_option_content = comment_div_2.find('div', attrs = {'class' : 'panel-body no-border'})
-            comment_options = comment_option_content.find('div', attrs = {'class' : 'review-options review-options--online'})
-
-            comment_option_list = comment_options.select('> div')
-            for comment_option in comment_option_list:
-                each_comment_option = comment_option.select('> div').get_text()
-                print each_comment_option
-            """
-
+    def sort_count(self):
+        self.sortcommentdb.sort_count()
+        self.sortcommentdb.make_user_list()
 
 if __name__ == '__main__':
     productdb = ProductDB()
     commentdb = CommentDB()
+    sortcommentdb = SortCommentDB()
 
-    result = CrawlComment(productdb, commentdb)
+    result = CrawlComment(productdb, commentdb, sortcommentdb)
     result.crawl_products_comments()
+    result.sort_count()

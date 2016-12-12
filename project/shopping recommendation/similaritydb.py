@@ -34,6 +34,7 @@ class SimilarityDB(object):
     def reset_similarity(self):
         self.usersim.delete_many({})
         self.itemsim.delete_many({})
+        print 'similarity deleted'
 
     def get_user_similarity(self, user1, user2, method, value):
         result = self.usersim.find_one({'user1' : user1, 'user2' : user2})

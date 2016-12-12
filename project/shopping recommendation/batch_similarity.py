@@ -38,29 +38,6 @@ def jaccard(grades1, grades2):
         return 0
     return float(min_sum / max_sum)
 
-'''
-def pearson2(grades1, grades2):
-    count_key = len(grades1.keys())
-    for product_link in grades2.keys():
-        if not product_link in grades1.keys():
-            count_key += 1
-
-    sum_grades1 = sum([float(grades1[product_link]) for product_link in grades1.keys()])
-    sum_grades2 = sum([float(grades2[product_link]) for product_link in grades2.keys()])
-
-    square_sum1 = sum([float(grades1[product_link])**2 for product_link in grades1.keys()])
-    square_sum2 = sum([float(grades2[product_link])**2 for product_link in grades2.keys()])
-
-    dot_value = float(sum([grades1[product_link] * grades2[product_link] for product_link in grades1.keys() if product_link in grades2.keys()]))
-
-    numerator = dot_value - ((sum_grades1 * sum_grades2)/count_key)
-    denominator = ((square_sum1 - ((sum_grades1**2)/count_key))*(square_sum2 - ((sum_grades2**2)/count_key)))**0.5
-
-    if denominator == 0:
-        return 0
-    return float(numerator / denominator)
-'''
-
 def pearson(grades1, grades2):
     temp_grades1 = grades1
     temp_grades2 = grades2
@@ -85,12 +62,13 @@ def pearson(grades1, grades2):
 
     return float(numerator / (np.sqrt(denominator1) * np.sqrt(denominator2)))
 
+
 class BatchModel(object):
     def __init__(self, gradedb, similaritydb):
         self.gradedb = gradedb
-        self.uservector = self.gradedb.get_uservector('train', blank = False)
+        self.uservector = self.gradedb.get_vector('user')
+        self.itemvector = self.gradedb.get_vector('item')
         self.similaritydb = similaritydb
-        self.itemvector = self.gradedb.get_itemvector()
 
     def get_similarity(self, model, method, part):
 
@@ -151,20 +129,20 @@ if __name__ == '__main__':
     similaritydb = SimilarityDB()
 
     result = BatchModel(gradedb, similaritydb)
-    result.get_similarity(model = 'user_based', method = cosine, part = 1)
-    result.get_similarity(model = 'user_based', method = cosine, part = 2)
-    result.get_similarity(model = 'user_based', method = cosine, part = 3)
-    result.get_similarity(model = 'user_based', method = cosine, part = 4)
-    result.get_similarity(model = 'user_based', method = cosine, part = 5)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 1)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 2)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 3)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 4)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 5)
 
-    result.get_similarity(model = 'user_based', method = jaccard, part = 1)
-    result.get_similarity(model = 'user_based', method = jaccard, part = 2)
-    result.get_similarity(model = 'user_based', method = jaccard, part = 3)
-    result.get_similarity(model = 'user_based', method = jaccard, part = 4)
-    result.get_similarity(model = 'user_based', method = jaccard, part = 5)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 1)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 2)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 3)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 4)
+    #result.get_similarity(model = 'user_based', method = jaccard, part = 5)
 
     #result.get_similarity(model = 'user_based', method = pearson, part = 1)
 
     result.get_similarity(model = 'item_based', method = cosine, part = 1)
-    result.get_similarity(model = 'item_based', method = jaccard , part = 1)
+    #result.get_similarity(model = 'item_based', method = jaccard , part = 1)
     #result.get_similarity(model = 'item_based', method = pearson , part = 1)

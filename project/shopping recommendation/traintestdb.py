@@ -5,89 +5,85 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import Comment, Product, Blank
+from model import Comment, Product, User
 import random
-from sqlalchemy import distinct
+from sqlalchemy import distinct, func
 
 class TrainTestDB(object):
     def __init__(self):
-        self.product_train = None
-        self.product_test = None
-        self.user_train = None
-        self.user_test = None
+        pass
 
     def product_train_test_set(self):
         session = Session()
 
-        product_num_1 = session.query(Product).all()
-        product_num = len(product_num_1)
-        product_train_num = int(0.95 * product_num)
+        product_num = session.query(Product).count()
+        product_train_num = int(0.95 * int(product_num))
         product_test_num = product_num - product_train_num
 
-        self.product_train = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(0, product_train_num).all()
-        self.product_test  = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(product_train_num, product_num+1).all()
-        session.close()
-
-        return self.product_train, self.product_test
-
-    def get_user_list(self):
-        session = Session()
-        user_list = []
-        for users in  session.query(distinct(Comment.Writer)).all():
-            user_list.append(users[0])
-        return user_list
-
-
-
-
-
-
-
-    def make_blank_test_set(self):
-
-        self.product_train_test_set()
-        session = Session()
-        session.query(Blank).delete()
-
-        for test_link in self.product_test:
-            grades_list = session.query(Comment).filter(Comment.ProductNo == test_link.ProductNo).all()
-            blank_comment_num = random.sample(range(len(grades_list)), 1)
-            print grades_list[blank_comment_num[0]].ProductNo, grades_list[blank_comment_num[0]].Writer
-
-            insert_blank_index = Blank(ProductNo = grades_list[blank_comment_num[0]].ProductNo, Writer = grades_list[blank_comment_num[0]].Writer)
-            session.add(insert_blank_index)
+        product_train_list = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(0, product_train_num).all()
+        for product_train in product_train_list:
+            update_tt = session.query(Product).filter(Product.ProductNo == product_train.ProductNo).one()
+            update_tt.TrainTest = 'train'
             session.commit()
 
+        product_test_list  = session.query(Product).order_by(Product.Enrolltime, Product.ProductNo).slice(product_train_num, product_num+1).all()
+        for product_test in product_test_list:
+            update_tt = session.query(Product).filter(Product.ProductNo == product_test.ProductNo).one()
+            update_tt.TrainTest = 'test'
+            session.commit()
         session.close()
 
-    def get_blank_test_set(self):
-        blank_comment_link = []
-        blank_comment_writer = []
-        blank_comment_set = []
+        print 'updated product'
 
+    def user_train_test_set(self):
         session = Session()
-        blank_zip = session.query(Blank).all()
-        if blank_zip:
-            for blank_comment in blank_zip:
-                blank_comment_set.append((blank_comment.ProductNo, blank_comment.Writer))
+        reset_tt = session.query(User).filter(User.TrainTest == 'test').all()
+        if reset_tt:
+            for row in reset_tt:
+                row.TrainTest = 'train'
+                session.commit()
+        print 'reset'
+        user_num = session.query(User).count()
+        user_test_num = int(0.05 * int(user_num))
+        print user_test_num
+
+        for row in session.query(User).order_by(func.rand()).limit(user_test_num):
+            print row.UserId
+            row.TrainTest = 'test'
+            session.commit()
         session.close()
+        print 'updated user'
 
-        return blank_comment_set
-
-    def get_test_item(self):
-        self.product_train_test_set()
+    def get_item_list(self, tt):
+        session = Session()
         item_list = []
-        for test_link in self.product_test:
-            item_list.append(str(test_link.ProductNo))
-
+        result = session.query(Product).filter(Product.TrainTest == tt).all()
+        for row in result:
+            item_list.append(row.ProductNo)
+        session.close()
         return item_list
 
-
-    '''
-    def get_user_list(self):
+    def get_user_list(self, tt):
         session = Session()
         user_list = []
-        for users in  session.query(distinct(Comment.Writer)).all():
-            user_list.append(users[0])
+        result = session.query(User).filter(User.TrainTest == tt).all()
+        for row in result:
+            user_list.append(row.UserId)
+        session.close()
         return user_list
-    '''
+
+    def get_blank_set(self, value):
+        print 'find blank set'
+        blank_set = []
+        blank_count = 0
+        session = Session()
+        result = session.query(Comment).join(Product, Product.ProductNo == Comment.ProductNo).join(User, User.UserId == Comment.Writer).filter(User.TrainTest == 'test', Product.TrainTest == 'test').all()
+        if result:
+            for row in result:
+                blank_set.append((row.ProductNo, row.Writer, row.Grade))
+                blank_count += 1
+                print 'item is {}, user is {} counting {}'.format(row.ProductNo, row.Writer, blank_count)
+        if value:
+            return blank_count
+        else:
+            return blank_set

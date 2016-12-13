@@ -16,13 +16,13 @@ class CrawlImvely(object):
         self.productdb = productdb
         self.product_zip = product_zip
         self.product_links = []
-        #self.imvely_home = "http://www.imvely.com"
 
     def crawl_products_link(self):
         for category in product_zip:
             self.crawl_ca_products(category, product_zip[category], pagenum = 1)
 
     def crawl_ca_products(self, category, url, pagenum):
+        # The page of cosmetic cateogry is different from others.
         if category != 'cosmetic':
             product_url = url + "&page={}".format(pagenum)
         else:
@@ -31,11 +31,16 @@ class CrawlImvely(object):
         response = requests.get(product_url)
         soup= BeautifulSoup(response.content)
 
+        # The page of cosmetic cateogry is different from others.
         if category != 'cosmetic':
-            body = soup.find('div', attrs = {'class' : 'xans-element- xans-product xans-product-normalpackage package_box '})
+            body = soup.find('div', attrs = {'class' : 'xans-element- \
+            xans-product xans-product-normalpackage package_box '})
         else:
-            body = soup.find('div', attrs = {'class' : 'xans-element- xans-product xans-product-listmain-42 xans-product-listmain xans-product-42'})
+            body = soup.find('div', attrs = {'class' : 'xans-element- \
+            xans-product xans-product-listmain-42 xans-product-listmain \
+            xans-product-42'})
 
+        #Find the information of product.
         product_lists = body.find('ul', attrs = {'class' : 'prdList column4'})
 
         if product_lists:
@@ -52,10 +57,12 @@ class CrawlImvely(object):
                 print title
 
                 try:
-                    self.productdb.save_product_info(productno ,link, title, category)
+                    self.productdb.save_product_info(productno ,link,
+                                                     title, category)
                 except Exception as e:
                     print e
 
+            #Recursive function
             if category != 'cosmetic':
                 pagenum += 1
                 self.crawl_ca_products(category, url, pagenum)
@@ -66,6 +73,7 @@ class CrawlImvely(object):
 if __name__ == "__main__":
     productdb = ProductDB()
 
+    #The imvely shopping mall page have some items in each category.
     product_zip = {}
     '''
     link_outer = 'http://www.imvely.com/product/list.html?cate_no=41'

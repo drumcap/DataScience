@@ -8,22 +8,28 @@ import numpy as np
 from gradedb import GradeDB
 from similaritydb import SimilarityDB
 
-
+# Cosine similarity formula
 def cosine(grades1, grades2):
+    #Use numpy to calculate norm easily
     grades1_val = np.array(grades1.values())
     grades2_val = np.array(grades2.values())
 
-    norm_value = float(np.sqrt(sum(grades1_val**2)) * np.sqrt(sum(grades2_val**2)))
-    dot_value = float(sum([grades1[product_link] * grades2[product_link] for product_link in grades1.keys() if product_link in grades2.keys()]))
+    norm_value = float(np.sqrt(sum(grades1_val**2)) *\
+                                            np.sqrt(sum(grades2_val**2)))
+    #Dot product with overlaped elements.
+    dot_value = float(sum([grades1[product_link] * grades2[product_link] \
+                            for product_link in grades1.keys() \
+                            if product_link in grades2.keys()]))
     if norm_value == 0:
         return 0
     return float(dot_value / norm_value)
 
-
+#Jaccard similarity formula
 def jaccard(grades1, grades2):
     temp_grades1 = grades1
     temp_grades2 = grades2
 
+    #Blank elements must be filled by 0 to find maximum and minimum value.
     for product_link in temp_grades1.keys():
         if not product_link in temp_grades2.keys():
             temp_grades2[product_link] = 0
@@ -32,16 +38,21 @@ def jaccard(grades1, grades2):
         if not product_link in temp_grades1.keys():
             temp_grades1[product_link] = 0
 
-    min_sum = float(sum([min(temp_grades1[product_link], temp_grades2[product_link]) for product_link in temp_grades1.keys()]))
-    max_sum = float(sum([max(temp_grades1[product_link], temp_grades2[product_link]) for product_link in temp_grades1.keys()]))
+    min_sum = float(sum([min(temp_grades1[product_link], \
+        temp_grades2[product_link]) for product_link in temp_grades1.keys()]))
+    max_sum = float(sum([max(temp_grades1[product_link], \
+        temp_grades2[product_link]) for product_link in temp_grades1.keys()]))
+
     if max_sum == 0:
         return 0
     return float(min_sum / max_sum)
 
+#Pearsion Correltion similarity formula
 def pearson(grades1, grades2):
     temp_grades1 = grades1
     temp_grades2 = grades2
 
+    #Blank elements must be filled by 0 to find (elements - sample mean)
     for product_link in temp_grades1.keys():
         if not product_link in temp_grades2.keys():
             temp_grades2[product_link] = 0
@@ -56,9 +67,13 @@ def pearson(grades1, grades2):
     grades1_mean = float(sum(grades1_val)) / len(grades1_val)
     grades2_mean = float(sum(grades2_val)) / len(grades2_val)
 
-    numerator = float(sum([(temp_grades1[product_link] - grades1_mean) * (temp_grades2[product_link] - grades2_mean) for product_link in temp_grades1.keys()]))
-    denominator1 = float(sum([(temp_grades1[product_link] - grades1_mean)**2 for product_link in temp_grades1.keys()]))
-    denominator2 = float(sum([(temp_grades2[product_link] - grades2_mean)**2 for product_link in temp_grades2.keys()]))
+    numerator = float(sum([(temp_grades1[product_link] - grades1_mean) * \
+                           (temp_grades2[product_link] - grades2_mean) \
+                           for product_link in temp_grades1.keys()]))
+    denominator1 = float(sum([(temp_grades1[product_link] - grades1_mean)**2 \
+                            for product_link in temp_grades1.keys()]))
+    denominator2 = float(sum([(temp_grades2[product_link] - grades2_mean)**2 \
+                            for product_link in temp_grades2.keys()]))
 
     return float(numerator / (np.sqrt(denominator1) * np.sqrt(denominator2)))
 
@@ -74,52 +89,62 @@ class BatchModel(object):
 
         if model == 'user_based':
             users = self.uservector.keys()
+            #users is divided 5 part to find similarity faster(multi-process)
             users.sort()
             divide = len(users) / 5
 
             divided_users = users[(part-1) * divide : part * divide]
             if part == 5:
                 divided_users = users[(part-1) * divide : ]
-
+            #Use existing_user list to avoid repeated calculation
             existing_user = []
-
+            #Each part has a different starting point
             for user1 in divided_users:
                 existing_user.append(user1)
                 for user2 in users:
                     if user2 in existing_user:
                         continue
                     else:
-                        users_similarity = method(self.uservector[user1], self.uservector[user2])
+                        users_similarity = method(self.uservector[user1],
+                                                  self.uservector[user2])
                         if users_similarity != 0:
                             print user1, user2, users_similarity
-                            self.insert_similarity(user1, user2, users_similarity, model, method.func_name)
+                            self.insert_similarity(user1, user2,
+                                                   users_similarity, model,
+                                                   method.func_name)
 
         elif model == 'item_based':
             items = self.itemvector.keys()
+            #Use existing_user list to avoid repeated calculation
             existing_item = []
-
+            
             for item1 in items:
                 existing_item.append(item1)
                 for item2 in items:
                     if item2 in existing_item:
                         continue
                     else:
-                        items_similarity = method(self.itemvector[item1], self.itemvector[item2])
+                        items_similarity = method(self.itemvector[item1],
+                                                  self.itemvector[item2])
                         if items_similarity != 0:
                             print item1, item2, items_similarity
-                            self.insert_similarity(item1, item2, items_similarity, model, method.func_name)
+                            self.insert_similarity(item1, item2,
+                                                   items_similarity, model,
+                                                   method.func_name)
 
 
-    def insert_similarity(self, item1, item2, items_similarity, model, func_name):
+    def insert_similarity(self, item1, item2, items_sim, model, func_name):
         if model == 'user_based':
             try:
-                self.similaritydb.save_user_similarity(item1, item2, items_similarity, func_name)
+                self.similaritydb.save_user_similarity(item1, item2,
+                                                       items_sim, func_name)
             except Exception as e:
                     print e
 
         elif model == 'item_based':
             try:
-                self.similaritydb.save_item_similarity(item1, item2, items_similarity, func_name)
+                self.similaritydb.save_item_similarity(item1, item2,
+                                                       items_sim, func_name)
             except Exception as e:
                     print e
 
@@ -129,11 +154,11 @@ if __name__ == '__main__':
     similaritydb = SimilarityDB()
 
     result = BatchModel(gradedb, similaritydb)
-    #result.get_similarity(model = 'user_based', method = cosine, part = 1)
-    #result.get_similarity(model = 'user_based', method = cosine, part = 2)
-    #result.get_similarity(model = 'user_based', method = cosine, part = 3)
-    #result.get_similarity(model = 'user_based', method = cosine, part = 4)
-    #result.get_similarity(model = 'user_based', method = cosine, part = 5)
+    result.get_similarity(model = 'user_based', method = cosine, part = 1)
+    result.get_similarity(model = 'user_based', method = cosine, part = 2)
+    result.get_similarity(model = 'user_based', method = cosine, part = 3)
+    result.get_similarity(model = 'user_based', method = cosine, part = 4)
+    result.get_similarity(model = 'user_based', method = cosine, part = 5)
 
     #result.get_similarity(model = 'user_based', method = jaccard, part = 1)
     #result.get_similarity(model = 'user_based', method = jaccard, part = 2)

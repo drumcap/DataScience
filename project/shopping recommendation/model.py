@@ -7,7 +7,8 @@ sys.setdefaultencoding('utf-8')
 
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, CHAR, Date, String, Time, Index, DateTime, TIMESTAMP, func, Float
+from sqlalchemy import Column, ForeignKey, Integer, CHAR, Date
+from sqlalchemy import String, Time, Index, DateTime, TIMESTAMP, func, Float
 from sqlalchemy.dialects.mysql import INTEGER, BIT, TINYINT, TIME, DOUBLE, TEXT
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -26,7 +27,8 @@ class Product(Base):
 class Comment(Base):
     __tablename__ = 'comments'
 
-    Id = Column(Integer, primary_key = True, autoincrement = True, nullable = False)
+    Id = Column(Integer, primary_key = True, autoincrement = True,
+                                                            nullable = False)
     ProductNo = Column(CHAR(50), nullable = False)
     Writer = Column(CHAR(50), nullable = False)
     Grade = Column(Integer, nullable = False)

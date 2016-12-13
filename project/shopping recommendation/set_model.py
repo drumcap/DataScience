@@ -13,6 +13,7 @@ class SetModel(object):
         self.traintestdb = traintestdb
         self.similaritydb = similaritydb
 
+    #Make train-test set.
     def set_model(self):
         self.traintestdb.product_train_test_set()
         self.traintestdb.user_train_test_set()
@@ -23,6 +24,7 @@ class SetModel(object):
         else:
             self.set_model()
 
+    #Make uservector and itemvector.
     def set_vector(self):
         gradedb = GradeDB()
         gradedb.delete_vector()

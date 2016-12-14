@@ -41,16 +41,21 @@
 ##	Code stream (in ‘code’ directory)
 *	connection.py : (This file is not in directory.) Connection information to database.
 *	model.py : Database(MySQL) structure
+
 1. product_crawler.py : Crawl the item's information and each link
 	* productdb.py : Save and get the item's information and each link
+
 2. comment_crawler.py : Crawl the writer's rating and ID from each link of items
 	* commentdb.py : Save and get the writer's rating and ID
 	* sortcommentdb.py : Count the number of rating per user and per item.
+
 3. set_model.py : Compose train, test set and create vector.
 	*	traintestdb.py : Divide items and users by train set and test set.
 	*	gradedb.py : Create user vector and item vector from train set.
+
 4. batch_similarity.py : Calculate Cosine, Jaccard, Pearson Correlation similarity.
 	* similaritydb.py : Save and get the similarity between users and items
+
 5. predict_score.py : Calculate MAE(mean absolute error), Recall, Precision from each model and similarity with threshold.
 
 

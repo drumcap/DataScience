@@ -70,7 +70,7 @@ Precision          | 0.0749 			  | calculating  |0.3654
 
 
 *	The popularity based CF recommends almost new items to users, so recall is 1 and precision is 0.0749. The accuracy of recommendation is poor.
-*	The recall of item based CF with cosine similarity (threshold=0.3) is 0.5862 and the precision is 0.3864. The accuracy of recommendation is increase.
+*	The recall of item based CF with jaccard similarity (threshold=0.1) is 0.5862 and the precision is 0.3864. The accuracy of recommendation is increase.
 *	There is so much blank in data and CF considers blank as 0. This situation brings about degradation of accuracy of recommendation.
 *	If real actual purchase history is used as input data, the accuracy of this recommendation system will be increase.
 

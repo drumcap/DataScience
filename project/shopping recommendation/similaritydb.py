@@ -61,9 +61,9 @@ class SimilarityDB(object):
 
     # return value is different by value parameter.
     def get_item_similarity(self, item1, item2, method, value):
-        result = self.itemsim.find_one({'item1' : item1, 'item2' : item2})
+        result = self.itemsim.find_one({'item1' : item1, 'item2' : item2, method : {'$exists' : True}})
         if not result:
-            result = self.itemsim.find_one({'item1' : item2, 'item2' : item1})
+            result = self.itemsim.find_one({'item1' : item2, 'item2' : item1, method : {'$exists' : True}})
         if not result:
             return 0
         if value:

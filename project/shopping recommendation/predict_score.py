@@ -244,11 +244,11 @@ if __name__ == '__main__':
     traintestdb = TrainTestDB()
     result = PredictScore(gradedb, similaritydb, traintestdb)
 
-    result.get_score(model = 'user_based', method = 'cosine', threshold = 0)
+    #result.get_score(model = 'user_based', method = 'cosine', threshold = 0)
     #result.get_score(model = 'user_based', method = 'pearson')
     #result.get_score(model = 'user_based', method = 'jaccard')
     result.get_score(model = 'item_based', method = 'cosine', threshold = 0.1)
     #result.get_score(model = 'item_based', method = 'jaccard')
     #result.get_score(model = 'item_based', method = 'pearson')
-    result.get_score(model = 'popularity_based', method = None,
-                                                            threshold = None)
+    #result.get_score(model = 'popularity_based', method = None,
+                                                            #threshold = None)

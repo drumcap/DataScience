@@ -117,7 +117,7 @@ class BatchModel(object):
             items = self.itemvector.keys()
             #Use existing_user list to avoid repeated calculation
             existing_item = []
-            
+
             for item1 in items:
                 existing_item.append(item1)
                 for item2 in items:
@@ -154,11 +154,11 @@ if __name__ == '__main__':
     similaritydb = SimilarityDB()
 
     result = BatchModel(gradedb, similaritydb)
-    result.get_similarity(model = 'user_based', method = cosine, part = 1)
-    result.get_similarity(model = 'user_based', method = cosine, part = 2)
-    result.get_similarity(model = 'user_based', method = cosine, part = 3)
-    result.get_similarity(model = 'user_based', method = cosine, part = 4)
-    result.get_similarity(model = 'user_based', method = cosine, part = 5)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 1)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 2)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 3)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 4)
+    #result.get_similarity(model = 'user_based', method = cosine, part = 5)
 
     #result.get_similarity(model = 'user_based', method = jaccard, part = 1)
     #result.get_similarity(model = 'user_based', method = jaccard, part = 2)
@@ -169,5 +169,5 @@ if __name__ == '__main__':
     #result.get_similarity(model = 'user_based', method = pearson, part = 1)
 
     result.get_similarity(model = 'item_based', method = cosine, part = 1)
-    #result.get_similarity(model = 'item_based', method = jaccard , part = 1)
-    #result.get_similarity(model = 'item_based', method = pearson , part = 1)
+    result.get_similarity(model = 'item_based', method = jaccard , part = 1)
+    result.get_similarity(model = 'item_based', method = pearson , part = 1)

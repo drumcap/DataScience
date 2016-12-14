@@ -5,19 +5,21 @@
 ##	Introduction
 *  The numerous online fashion stores in Korea recommend ‘some items purchased by other members who purchased this item’ or ‘the most popular items’ to their members. However the accuracy of recommendation is poor.
 
-*  To improve the performance of recommendation, I use collaborative filtering with member`s ratings of each item.
+*  To improve the performance of recommendation, I use collaborative filtering with member's ratings of each item.
 
 ##	Language, Tool, Database
 *	Python
 *	Request, Beautifulsoup (web crawling)
 *	Sqlalchemy, pymongo(connect to Database)
 *	MySQL(save shopping mall data), MongoDB(save vector, similarity)
+
 ##	Data
 *	The data is crawled from the popular Korean fashion online shopping mall for women.
 *	The number of items :1,030
 *	The number of writers : 32,569
 *	The number of ratings : 153,803 (0.45% is filled)
 *	The ratings of each item are used for collaborative filtering.
+
 ##	Collaborative filtering
 * Model
 	*	User based CF
@@ -39,10 +41,10 @@
 ##	Code stream (in ‘code’ directory)
 *	connection.py : (This file is not in directory.) Connection information to database.
 *	model.py : Database(MySQL) structure
-1. product_crawler.py : Crawl the item`s information and each link
-	* productdb.py : Save and get the item`s information and each link
-2. comment_crawler.py : Crawl the writer`s rating and ID from each link of items
-	* commentdb.py : Save and get the writer`s rating and ID
+1. product_crawler.py : Crawl the item's information and each link
+	* productdb.py : Save and get the item's information and each link
+2. comment_crawler.py : Crawl the writer's rating and ID from each link of items
+	* commentdb.py : Save and get the writer's rating and ID
 	* sortcommentdb.py : Count the number of rating per user and per item.
 3. set_model.py : Compose train, test set and create vector.
 	*	traintestdb.py : Divide items and users by train set and test set.

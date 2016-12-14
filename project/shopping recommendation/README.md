@@ -60,8 +60,8 @@
 
 Train/Test(95%/5%) | Ppopularity based CF | user bsed CF | item bsed CF
 ------------------ | -------------------- |--------------| ------------
-Recall             | 1.0 				  | calculating  |0.5862
-Precision          | 0.0749 			  | calculating  |0.3864
+Recall             | 1.0 				  | calculating  |0.6552
+Precision          | 0.0749 			  | calculating  |0.3654
 
 
 *	The popularity based CF recommends almost new items to users, so recall is 1 and precision is 0.0749. The accuracy of recommendation is poor.

@@ -38,7 +38,7 @@
 	*	Pearson Correlation
 		*	The most of Pearson Correlation is negative, so Pearson Correlation is not suitable for this system.
 
-##	Code stream (in ‘code’ directory)
+##	Code files (in ‘code’ directory)
 *	connection.py : (This file is not in directory.) Connection information to database.
 *	model.py : Database(MySQL) structure
 

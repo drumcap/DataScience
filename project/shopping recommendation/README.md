@@ -56,7 +56,8 @@
 
 
 ##	Summary
-with Cosine similarity, threshold is 0.3
+* with Cosine similarity, threshold is 0.3
+
 Train/Test(95%/5%) | Ppopularity based CF | user bsed CF | item bsed CF
 ------------------ | -------------------- |--------------| ------------
 Recall             | 1.0 				  | calculating  |0.5862
@@ -70,4 +71,4 @@ Precision          | 0.0749 			  | calculating  |0.3864
 
 ## Link
 * Slideshare : http://www.slideshare.net/alexMoon18/ss-70094135
-* Linkedin :http://www.linkedin.com/in/alex-moon-99b077132
+* Linkedin : http://www.linkedin.com/in/alex-moon-99b077132

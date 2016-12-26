@@ -66,3 +66,16 @@ class NewsDb(object):
         result = [row.Link for row in somedays_news]
 
         return result
+
+    def find_keyword_in_contents(self, keyword):
+
+        session = Session()
+        result = session.query(NewsArticle).filter(NewsArticle.Content.like('%' + keyword + '%')).all()
+        news_list = []
+        for row in result:
+            news_dict = {}
+            news_dict['link'] = row.Link
+            news_dict['title'] = row.Title
+            news_dict['content'] = row.Content
+            news_list.append(news_dict)
+        return news_list

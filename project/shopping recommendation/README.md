@@ -63,7 +63,7 @@
 ##	Summary
 * with Jaccard similarity, threshold is 0.1
 
-Train/Test(95%/5%) | Ppopularity based CF | user bsed CF | item bsed CF
+Train/Test(95%/5%) | popularity based CF | user bsed CF | item bsed CF
 ------------------ | -------------------- |--------------| ------------
 Recall             | 1.0 				  | 0.7241  |0.6552
 Precision          | 0.0749 			  | 0.1680  |0.3654

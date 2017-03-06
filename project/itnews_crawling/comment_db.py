@@ -31,3 +31,24 @@ class CommentDb(object):
             return True
 
         session.close()
+
+    def get_comment_by_keyword(self, keyword, page, page_size):
+        if page <= 0 or page_size <= 0:
+            return []
+
+        key_comment = []
+        session = Session()
+        result = session.query(CommentList).filter(CommentList.Mcontent.like('%' + keyword + '%'))\
+                        .order_by(CommentList.Enrolltime)\
+                        .offset((page-1) * page_size).limit(page_size)
+
+        for row in result:
+            comment = {}
+            comment['link'] = row.Link
+            comment['content'] = row.Mcontent
+
+            key_comment.append(comment)
+
+        session.close()
+
+        return key_comment

@@ -5,9 +5,9 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from connection import Session
-from model import NewsArticle
+from model import NewsArticle, CommentList
 from cache_news import CacheNews
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 import datetime
 
 class NewsDb(object):
@@ -79,3 +79,32 @@ class NewsDb(object):
             news_dict['content'] = row.Content
             news_list.append(news_dict)
         return news_list
+
+    def get_top_news(self, sort):
+
+        session = Session()
+        if sort == 'new':
+            result = session.query(NewsArticle).order_by(desc(NewsArticle.ReportDate)).limit(5)
+        elif sort == 'comment':
+            result = session.query(NewsArticle.Title, NewsArticle.Content, func.count(CommentList.Id).label('cnt'))\
+            .join(CommentList, NewsArticle.Link == CommentList.Link)\
+            .group_by(NewsArticle.Link).order_by('cnt desc').limit(5)
+
+        title_content = []
+        for row in result:
+            title_content.append({'title': row.Title, 'content': row.Content})
+
+        return title_content
+
+    def delete_news(self, link):
+        try:
+            session = Session()
+            session.query(NewsArticle).filter(NewsArticle.Link == link).delete()
+            #session.commit()
+            return 'Success'
+        except Exception as e:
+            return "Failure"
+        finally:
+            session.close()
+
+    def get_similar_news(self, link):

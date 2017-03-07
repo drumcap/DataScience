@@ -19,7 +19,7 @@ def hello_word():
 
 @app.route('/test')
 def hello_json():
-    data = {'name' : 'alex', 'company' : 'fastcampus'}
+    data = {'name' : 'alex', 'description' : 'implemented web api on this page'}
     return jsonify(data)
 
 @app.route('/news/search/<keyword>')

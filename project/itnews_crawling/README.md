@@ -41,9 +41,11 @@
 
 ## Delete news
 *  This function is available only when using HTTP mehod [DELETE]
-*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/<newslink>
+*  Ex. news_id = 105:030:0002554794
+*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/105:030:0002554794
 
 ## Find similar news
 *  used Konlpy which is Korean morphological analyzer.
-*  This function is available only on the local computer.
-*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/similar_news/<news_id>
+*  This function is available only on the local computer because of server performance.
+*  Ex. news_id = 105:030:0002554794
+*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/similar_news/105:030:0002554794

@@ -60,10 +60,12 @@ def search_comment(keyword):
     result = commentdb.get_comment_by_keyword(str(keyword), page, page_size)
     return jsonify(result)
 
-@app.route('/news/<link>', methods = ['DELETE'])
-def delete_news(link):
+@app.route('/news/<news_id>', methods = ['DELETE'])
+def delete_news(news_id):
+    ids = news_id.split(':')
+    news_id = 'http://news.naver.com/main/read.nhn?mode=LSD&mid=sec&sid1={}&oid={}&aid={}'.format(ids[0], ids[1], ids[2])
     newsdb = NewsDb()
-    result = newsdb.delete_news(link)
+    result = newsdb.delete_news(news_id)
 
     return jsonify({'result' : result})
 
@@ -83,8 +85,8 @@ def get_similar_news(news_id):
     ids = news_id.split(':')
     news_id = 'http://news.naver.com/main/read.nhn?mode=LSD&mid=sec&sid1={}&oid={}&aid={}'.format(ids[0], ids[1], ids[2])
     newsdb = NewsDb()
-    result = newsdb.get_similar_news(news_id)
-
+    #result = newsdb.get_similar_news(news_id)
+    result = [{'description' : 'This function is available only on the local computer because of server performance.'}]
     return jsonify(result)
 
 @app.route('/news/test', methods=['POST'])

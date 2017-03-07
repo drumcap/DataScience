@@ -31,7 +31,7 @@
 
 ##  TOP5 news
 *  Standard : recent
-*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/top5?sort=news
+*  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/top5?sort=new
 *  Standard : the number of comment
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/top5?sort=comment
 

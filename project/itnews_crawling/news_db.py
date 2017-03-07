@@ -9,6 +9,7 @@ from model import NewsArticle, CommentList
 from cache_news import CacheNews
 from sqlalchemy import desc, func
 import datetime
+import numpy as np
 
 class NewsDb(object):
     def __init__(self):
@@ -107,4 +108,62 @@ class NewsDb(object):
         finally:
             session.close()
 
+    def get_news_contents(self, link):
+        try:
+            session = Session()
+            result = session.query(NewsArticle).filter(NewsArticle.Link == link).first()
+            return result.Content
+        except Exception as e:
+            print e
+            return ''
+        finally:
+            session.close()
+
+    def is_number(self, char):
+        return all(string.isdigit() for string in char)
+
     def get_similar_news(self, link):
+        Kkma = Kkma()
+        content = self.get_news_contents(link)
+        query_nouns = Kkma.nouns(unicode(content))
+
+        news_word_vector = {str(noun) : content.count(str(noun)) for noun in query_nouns
+                            if not self.is_number(n) and content.count(str(noun)) > 1 and len(str(noun)) > 1}
+
+        session = Session()
+        result = session.query(NewsArticle).filter(NewsArticle.Link != link).limit(50)
+
+        similar_news = []
+        for row in result:
+            result_nouns = Kkma.nouns(unicode(row.Content))
+            another_word_vector = {str(noun) : row.Content.count(str(noun)) for noun in result_nouns
+                                    if not self.is_number(noun) and row.Content.count(str(noun)) > 1 and len(str(noun)) > 1}
+
+            if len(another_word_vector) <= 0:
+                continue
+
+            query_keys = news_word_vector.keys()
+            result_keys = another_word_vector.keys()
+
+            query_keys.extend(result_keys)
+            allkeys = list(set(query_keys))
+            dot_product = 0
+            for key in allkeys:
+                q_val = 0
+                if key in news_word_vector:
+                    q_val = news_word_vector[key]
+
+                r_val = 0
+                if key in another_word_vector:
+                    r_val = another_word_vector[key]
+
+                dot_product += q_val * r_val
+
+            q_size = np.sqrt(np.sum(np.array(news_word_vector.values()) ** 2))
+            r_size = np.sqrt(np.sum(np.array(another_word_vector.values()) ** 2))
+            similarity = dot_product / float(q_size * r_size)
+            similar_news.append((row.Link, similarity, result_nouns))
+
+        similar_news = sorted(similar_news, key = lambda x : x[1], reverse = True)
+
+        return {'query_noun' : query_nouns, 'similar_news' : similar_news}

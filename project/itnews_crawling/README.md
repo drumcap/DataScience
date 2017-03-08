@@ -8,7 +8,12 @@
 ##  Link
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/test
 
-##  Database & Server
+## Language, Tool, Database, Server
+*  Python
+*  Request, Beautifulsoup(web crawling)
+*  Sqlalchemy
+*  Konlpy
+*  Flask
 *  MySQL, Redis
 *  AWS - EC2(ubuntu)
 

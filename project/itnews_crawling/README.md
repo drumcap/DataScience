@@ -1,9 +1,9 @@
 # IT news crawler & web api with Flask
 
 ##  Introduction
-*  Crawled from It news web page and external API.
-*  All data stored in MySQL and recent news stored in Redis too.
-*  Some function like searching keyword can be used by web API.
+*  Crawled from IT news on web page and external API.
+*  All data stored in MySQL and recent news stored in Redis.
+*  Some functions like searching keyword can be used by web API.
 
 ##  Link
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/test
@@ -18,7 +18,7 @@
 
 ##	API key issuance
 *  Ex. user_id = alexmoon
-*  save to Redis http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/auth?user_id=alexmoon
+*  Save to Redis http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/auth?user_id=alexmoon
 
 ##	User Authentication & keyword search
 *  Ex. keyword = 포켓몬
@@ -40,12 +40,12 @@
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/comment/search/포켓몬?page=2&pagesize=2
 
 ## Delete news
-*  This function is available only when using HTTP mehod [DELETE]
+*  This function is only available when using HTTP mehod [DELETE]
 *  Ex. news_id = 105:030:0002554794
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/news/105:030:0002554794
 
 ## Find similar news
-*  used Konlpy which is Korean morphological analyzer.
-*  This function is available only on the local computer because of server performance.
+*  This function is only available on the local computer because of server performance.
+*  Used Konlpy which is Korean morphological analyzer.
 *  Ex. news_id = 105:030:0002554794
 *  http://ec2-54-213-221-13.us-west-2.compute.amazonaws.com:5000/similar_news/105:030:0002554794

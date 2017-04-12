@@ -6,7 +6,8 @@ sys.setdefaultencoding('utf-8')
 
 import uuid
 
-from flask import Flask, jsonify, request
+import json
+from flask import Flask, request
 from news_db import NewsDb
 from cache_news import CacheNews
 from comment_db import CommentDb
@@ -19,8 +20,8 @@ def hello_word():
 
 @app.route('/test')
 def hello_json():
-    data = {'name' : 'alex', 'description' : 'implemented web api on this page'}
-    return jsonify(data)
+    data = {'name' : '문', 'description' : 'implemented web api on this page'}
+    return json.dumps(data, ensure_ascii=False)
 
 @app.route('/news/search/<keyword>')
 def search_contents(keyword):
@@ -35,13 +36,14 @@ def search_contents(keyword):
         result = newsdb.find_keyword_in_contents(str(keyword))
     else:
         result = {'result' : '인증 실패'}
-    return jsonify(result)
+    return  json.dumps(result, ensure_ascii=False)
+    
 
 @app.route('/news/recent')
 def get_recent_10():
     cachenews = CacheNews()
     result = cachenews.get_recent_news()
-    return jsonify(result)
+    return json.dumps(result, ensure_ascii=False)
 
 @app.route('/news/top5')
 def get_top_news():
@@ -49,7 +51,7 @@ def get_top_news():
     sort = request.args.get('sort')
     result = newsdb.get_top_news(sort)
 
-    return jsonify(result)
+    return json.dumps(result, ensure_ascii=False)
 
 @app.route('/comment/search/<keyword>')
 def search_comment(keyword):
@@ -58,7 +60,7 @@ def search_comment(keyword):
     page_size = int(request.args.get('pagesize'))
 
     result = commentdb.get_comment_by_keyword(str(keyword), page, page_size)
-    return jsonify(result)
+    return json.dumps(result, ensure_ascii=False)
 
 @app.route('/news/<news_id>', methods = ['DELETE'])
 def delete_news(news_id):
@@ -67,7 +69,7 @@ def delete_news(news_id):
     newsdb = NewsDb()
     result = newsdb.delete_news(news_id)
 
-    return jsonify({'result' : result})
+    return json.dumps({'result' : result}, ensure_ascii=False)
 
 @app.route('/auth')
 def auth():
@@ -76,7 +78,7 @@ def auth():
     apikey = str(uuid.uuid4())
 
     cachenews.hold_user_key(user_id, apikey)
-    return jsonify({'apikey': apikey})
+    return json.dumps({'apikey': apikey}, ensure_ascii=False)
     #id: moonkwoo
     #api: 0e368fcb-2816-43ae-b866-4585bbd62186
 
@@ -87,7 +89,7 @@ def get_similar_news(news_id):
     newsdb = NewsDb()
     #result = newsdb.get_similar_news(news_id)
     result = [{'description' : 'This function is available only on the local computer because of server performance.'}]
-    return jsonify(result)
+    return json.dumps(result, ensure_ascii=False)
 
 @app.route('/news/test', methods=['POST'])
 def news_post_test():
@@ -95,16 +97,16 @@ def news_post_test():
     test = request.form['email']
     test2 = request.form['password']
 
-    return jsonify({'result' : 1})
+    return json.dumps({'result' : 1}, ensure_ascii=False)
 
 @app.route('/users', methods=['GET'])
 def users():
     user_id = request.args.get('user_id')
-    return jsonify({'user' : user_id})
+    return json.dumps({'user' : user_id}, ensure_ascii=False)
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def users_rest(user_id):
-    return jsonify({'user' : user_id})
+    return json.dumps({'user' : user_id}, ensure_ascii=False)
 
 @app.route('/method', methods=['GET', 'POST', 'DELETE'])
 def method():
@@ -118,7 +120,7 @@ def method():
     elif request.method == 'PUT':
         print 'PUT'
 
-    return jsonify({'result' : request.method})
+    return json.dumps({'result' : request.method}, ensure_ascii=False)
 
 if __name__ == '__main__':
     app.run(debug = True, host = '0.0.0.0', port = 5000)
